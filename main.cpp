@@ -17,6 +17,7 @@ struct User
 
 void clearExtra()
 {
+  // clears extraneous input in the buffer
   std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 }
 
@@ -136,8 +137,7 @@ void login()
     std::cin >> _username;
     clearExtra();
     std::cout << "Password: ";
-    std::cin >> _passwd;
-    clearExtra();
+    _passwd = getpass("Enter your password: ", true);
     
     std::string _usr_pswd{searchFile("database",_username)};
     if(_usr_pswd == _passwd)
