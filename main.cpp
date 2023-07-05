@@ -109,7 +109,7 @@ try
           std::string _line;
           while(std::getline(_temp_file, _line))
           {
-            _cred.emplace_back(static_cast<std::string>(_line.c_str()));
+            _cred = (static_cast<std::string>(_line.c_str()));
           }
           return _cred;
           _temp_file.close();
@@ -139,8 +139,8 @@ void login()
     std::cin >> _passwd;
     clearExtra();
     
-
-    if(auto _usr_pswd{searchFile("database", _username)} == _passwd)
+    std::string _usr_pswd{searchFile("database",_username)};
+    if(_usr_pswd == _passwd)
     {
       std::cout << "Login successful, welcome back :3 \n";
       _logged_in = true;
