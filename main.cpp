@@ -2,6 +2,7 @@
 #include <iostream>
 #include <termios.h> //tcsetattr
 #include <unistd.h> //STDIN_FILENO
+#include <chrono>
 #include <string>
 #include <vector>
 #include <fstream>
@@ -19,6 +20,15 @@ void clearExtra()
 {
   // clears extraneous input in the buffer
   std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+}
+
+// print the last time a file was modified
+void get_lst_write_time(const std::filesystem::path& entry)
+{
+  auto ftime = std::filesystem::last_write_time(entry);
+  std::time_t cftime = 
+    std::chrono::system_clock::to_time_t(std::chrono::file_clock::to_sys(ftime));
+  std::cout << std::asctime(std::localtime(&cftime)) << '\n';
 }
 
 
@@ -174,6 +184,11 @@ void registration()
   _user.m_username += std::to_string(_user.m_id);
   std::cout << "User created successfully, welcome :3 \n";
   saveToFile(_user);
+
+  std::string _temp_pathname {"database/" + _user.m_username + ".txt"};
+  std::filesystem::path _temp_entry{_temp_pathname};
+  std::cout << "pathname: " << _temp_pathname << "| last write time: ";
+  get_lst_write_time(_temp_entry);
   std::cout << _user.m_username << '\n' << _user.m_password << '\n' << _user.m_id <<'\n';
 }
 
