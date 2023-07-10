@@ -101,29 +101,30 @@ void saveToFile(User &new_user)
     std::cerr << "Error: could not open file \n";
 }
 
+
 bool check_username_fs(std::filesystem::path path, std::string &usn)
 {
   if(std::filesystem::is_directory(path))
   {
-    for(const std::filesystem::directory_entry& entr : std::filesystem::directory_iterator(path))
+    bool _found{false};
+    std::filesystem::path _temp_dirEntry {"database/"+usn+".txt"};
+    for(const auto& dirEntry : std::filesystem::recursive_directory_iterator(path))
     {
-      const std::filesystem::path& pth = entr;
-      std::cout << entr.path() << '\n';
-      if(pth.stem() == usn)
+      std::cout << dirEntry << '\n';
+      if(dirEntry == _temp_dirEntry)
       {
-        std::cout << "Found it \n";
+        std::cout << "FOUND IT \n";
+        _found = true;
         return true;
       }
-      else
-      {
-        std::cerr << "ERROR: Username does not exist \n";
-        return false;
-      }
     }
-
+    if(_found != true)
+    {
+      std::cout << "Username does not exist, try another one. \n";
+      return false; // ugly, too bad!
+    }
   }
 }
-
 
 std::string searchFile(std::filesystem::path path, std::string &usn)
 try
@@ -166,10 +167,21 @@ void login()
 
   while(!_logged_in)
   {
+    bool _found_user{false};
     std::cout << "Login: \n" << "User: ";
     std::cin >> _username;
-    if(check_username_fs("database", _username) == false)
-      continue;
+    while(_found_user != true)
+    {
+      _found_user = check_username_fs("database",_username);
+      if(_found_user == true)
+        break;
+      else
+      {
+        std::cout << "User: ";
+        std:: cin >> _username;
+      }
+    }
+
     clearExtra();
     std::cout << "Password: ";
     _passwd = getpass("Enter your password: ", true);
