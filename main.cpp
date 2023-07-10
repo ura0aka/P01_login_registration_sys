@@ -101,6 +101,29 @@ void saveToFile(User &new_user)
     std::cerr << "Error: could not open file \n";
 }
 
+bool check_username_fs(std::filesystem::path path, std::string &usn)
+{
+  if(std::filesystem::is_directory(path))
+  {
+    for(const std::filesystem::directory_entry& entr : std::filesystem::directory_iterator(path))
+    {
+      const std::filesystem::path& pth = entr;
+      std::cout << entr.path() << '\n';
+      if(pth.stem() == usn)
+      {
+        std::cout << "Found it \n";
+        return true;
+      }
+      else
+      {
+        std::cerr << "ERROR: Username does not exist \n";
+        return false;
+      }
+    }
+
+  }
+}
+
 
 std::string searchFile(std::filesystem::path path, std::string &usn)
 try
@@ -125,7 +148,7 @@ try
           return _cred;
           _temp_file.close();
         }
-      } 
+      }
     }
   }
 }
@@ -145,11 +168,13 @@ void login()
   {
     std::cout << "Login: \n" << "User: ";
     std::cin >> _username;
+    if(check_username_fs("database", _username) == false)
+      continue;
     clearExtra();
     std::cout << "Password: ";
     _passwd = getpass("Enter your password: ", true);
     
-    std::string _usr_pswd{searchFile("database",_username)};
+    std::string _usr_pswd{searchFile("database",_username)}; // code breaks here if the entered username is wrong or if it doesn't exist in the database
     if(_usr_pswd == _passwd)
     {
       std::cout << "Login successful, welcome back :3 \n";
